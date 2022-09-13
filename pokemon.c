@@ -133,23 +133,54 @@ float getDamage(float ** damageMat, float ** typeMat, int rowIndex, int colIndex
     int rightPokeType = typeMat[rowIndex+1][colIndex];
     int upPokeType = typeMat[rowIndex][colIndex-1];
     int downPokeType = typeMat[rowIndex][colIndex+1];
+    
     return damageMat[leftPokeType][actualPokeType] 
             + damageMat[rightPokeType][actualPokeType] 
             + damageMat[upPokeType][actualPokeType] 
             + damageMat[downPokeType][actualPokeType];
 }
 
-void actNewMats(float ** oldTypeMat, float ** newTypeMat, float ** oldLifeMat, float ** newLifeMat, float ** damageMat, int rows, int columns){
+float randNeighbour(float ** typeMat, int rowIndex, int colIndex, int rows, int columns){
+    size_t i;
+    float neighbour;
+    float neighbours[] = {typeMat[rowIndex-1][colIndex], 
+                            typeMat[rowIndex+1][colIndex],
+                            typeMat[rowIndex][colIndex-1],
+                            typeMat[rowIndex][colIndex +1]};
+
+    while (neighbour != (0.0 || 1.0 || 2.0)){
+        i = rand() % 4; 
+        neighbour = neighbours[i];
+    }
+    return neighbour;
+    // si se mueren un cuadrado de 3x3 al mismo tiempo, saltaria un error con el espacio del medio, porque si el while corre hasta que no sea pared
+    //y hasta que encuentre un vecino vivo para reemplazar, habria que crear un tipo de poke vacio
+
+}
+
+void actNewMats(float ** oldTypeMat, float ** newTypeMat, float ** lifeMat, float ** damageMat, int rows, int columns){
+    int neighboursType[4];
+    int randNeighbour;
     for(size_t r=0; r<rows; r++){
         for (size_t c=0; c<rows; c++){
             if (oldTypeMat[r][c] != 3){
-                if(oldLifeMat[r][c] > 0){
-                    oldLifeMat[r][c] = oldLifeMat[r][c] - getDamage(damageMat, oldTypeMat, r, c);
+                if(lifeMat[r][c] > 0){
+                    lifeMat[r][c] = lifeMat[r][c] - getDamage(damageMat, oldTypeMat, r, c);
+                }if(lifeMat[r][c] <= 0){
+
+                    /*neighboursType[0] = oldTypeMat[r-1][c];
+                    neighboursType[1] = oldTypeMat[r+1][c];
+                    neighboursType[2] = oldTypeMat[r][c-1];
+                    neighboursType[3] = oldTypeMat[r][c+1];
+                    randNeighbour = rand() %3;
+                    while*/
                 }
             }
         }
     }
 }
+
+
 
 void copyAndCleanMat(float **new_mat, float **old_mat, size_t rows, size_t columns){
     for (size_t r = 0; r < rows; r++){
@@ -228,7 +259,7 @@ int play() {
 
         genLifeMat( &life, rows, cols, filePointer ); 
         genTypeMat( &type, rows, cols, filePointer );
-        genBlankMat( &modifLife, rows, cols, filePointer );
+        //genBlankMat( &modifLife, rows, cols, filePointer );
         genBlankMat( &modifType, rows, cols, filePointer );
         genTypeDamageMat(&typeDamage);
         
@@ -241,7 +272,7 @@ int play() {
         printf(" \n");
         matShow( type, rows, cols );
         printf(" \n");
-        actNewMats(type, modifType, life, modifLife, typeDamage, rows, cols);
+        actNewMats(type, modifType, life, typeDamage, rows, cols);
         matShow( life, rows, cols );
 
         //copyAndCleanMat(type, life, rows, cols);
