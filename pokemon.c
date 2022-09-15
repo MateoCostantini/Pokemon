@@ -42,10 +42,10 @@ float **matNew( size_t rows, size_t cols ) {
     return m;
 }*/
 
-void genLifeMat( float ***mat, size_t rows, size_t columns, FILE *filePointer ) {
+void genLifeMat( float ***mat, size_t rows, size_t columns, FILE *filePointer, float value) {
     *mat = matNew( rows, columns );
-    float value;
-    fscanf( filePointer, "%f", &value );
+    /*float value;
+    fscanf( filePointer, "%f", &value );*/
 
     for ( size_t r = 0; r < rows; r++ ){ 
         for ( size_t c = 0; c < columns; c++ ){ 
@@ -127,8 +127,8 @@ void matShow( float ** mat, size_t rows, size_t cols ) {
 
 //Hacer que se ataquen usando la matriz de damage para calcular el da~no
 
-float getDamage(float ** damageMat, float ** typeMat, int rowIndex, int colIndex){
-    int actualPokeType = typeMat[rowIndex][colIndex];
+float genDamage(float ** lifeMat, float ** damageMat, float ** typeMat, int rowIndex, int colIndex){
+    /*int actualPokeType = typeMat[rowIndex][colIndex];
     int leftPokeType = typeMat[rowIndex-1][colIndex];
     int rightPokeType = typeMat[rowIndex+1][colIndex];
     int upPokeType = typeMat[rowIndex][colIndex-1];
@@ -137,7 +137,32 @@ float getDamage(float ** damageMat, float ** typeMat, int rowIndex, int colIndex
     return damageMat[leftPokeType][actualPokeType] 
             + damageMat[rightPokeType][actualPokeType] 
             + damageMat[upPokeType][actualPokeType] 
-            + damageMat[downPokeType][actualPokeType];
+            + damageMat[downPokeType][actualPokeType];*/
+
+    float damage;
+    float killerType;
+    int actualPokeType = typeMat[rowIndex][colIndex];
+    //int actualPokeLife = lifeMat[rowIndex][colIndex];
+    int leftPokeType = typeMat[rowIndex-1][colIndex];
+    int rightPokeType = typeMat[rowIndex+1][colIndex];
+    int upPokeType = typeMat[rowIndex][colIndex-1];
+    int downPokeType = typeMat[rowIndex][colIndex+1];
+    int neighbours[] = {leftPokeType, rightPokeType, upPokeType, downPokeType};
+    size_t i = 0;
+
+    while(lifeMat[rowIndex][colIndex] > 0 && i<4){
+        damage = damageMat[neighbours[i]][actualPokeType];
+        lifeMat[rowIndex][colIndex] -= damage;
+        //actualPokeLife = actualPokeLife - damage;
+        if (lifeMat[rowIndex][colIndex] < 0){
+            killerType = neighbours[i];
+            i = 0;
+            return killerType;
+        }else{
+            i++;
+        }
+    }  
+    return -1.0;  
 }
 
 float randNeighbour(float ** typeMat, int rowIndex, int colIndex, int rows, int columns){
@@ -156,18 +181,23 @@ float randNeighbour(float ** typeMat, int rowIndex, int colIndex, int rows, int 
     // si se mueren un cuadrado de 3x3 al mismo tiempo, saltaria un error con el espacio del medio, porque si el while corre hasta que no sea pared
     //y hasta que encuentre un vecino vivo para reemplazar, habria que crear un tipo de poke vacio
 
+//podria hacer que se peguen de a uno y crear un while el que recibe dano sigue vivo y falta que alguien le pegue, que le sigan pegando y sino que se cambie
+// al tipo del ultimo que le pego (si se murio)
 }
 
-void actNewMats(float ** oldTypeMat, float ** newTypeMat, float ** lifeMat, float ** damageMat, int rows, int columns){
+void actTypeMat(float ** oldTypeMat, float ** newTypeMat, float ** lifeMat, float ** damageMat, int rows, int columns, float initialLife){
     int neighboursType[4];
     int randNeighbour;
+    float killer;
     for(size_t r=0; r<rows; r++){
         for (size_t c=0; c<rows; c++){
             if (oldTypeMat[r][c] != 3){
                 if(lifeMat[r][c] > 0){
-                    lifeMat[r][c] = lifeMat[r][c] - getDamage(damageMat, oldTypeMat, r, c);
-                }if(lifeMat[r][c] <= 0){
-
+                    killer = genDamage(lifeMat, damageMat, oldTypeMat, r, c);
+                    newTypeMat[r][c] = oldTypeMat[r][c];
+                }if(lifeMat[r][c] <= 0 && killer != -1.0){
+                    newTypeMat[r][c] = killer;
+                    lifeMat[r][c] = initialLife;
                     /*neighboursType[0] = oldTypeMat[r-1][c];
                     neighboursType[1] = oldTypeMat[r+1][c];
                     neighboursType[2] = oldTypeMat[r][c-1];
@@ -182,14 +212,15 @@ void actNewMats(float ** oldTypeMat, float ** newTypeMat, float ** lifeMat, floa
 
 
 
+
 void copyAndCleanMat(float **new_mat, float **old_mat, size_t rows, size_t columns){
     for (size_t r = 0; r < rows; r++){
         for (size_t c = 0; c < columns; c++){
              old_mat[r][c] = new_mat[r][c];
              if(r == 0 || r == rows -1 || c == 0 || c == columns - 1){
-                new_mat[r][c] = 3;
+                new_mat[r][c] = 3.0;
            } else {
-                new_mat[r][c] = 0;
+                new_mat[r][c] = 0.0;
            }
         }
     }
@@ -237,6 +268,7 @@ void matFree(int ***mat, size_t rows, size_t cols) {
 int play() {
     FILE *filePointer ;
     int rows, cols;
+    float initialLife;
     int const typesPokes = 4;
 
     filePointer = fopen( "text.txt", "r" ) ;
@@ -246,18 +278,18 @@ int play() {
     } else {
         printf("The file is now opened.\n") ;
          
-        fscanf( filePointer, "%d %d", &rows, &cols );
+        fscanf( filePointer, "%d %d %f", &rows, &cols, &initialLife);
         printf( "<%d %d>\n", rows, cols) ;
         rows = rows + 2;
         cols = cols + 2;
 
         float **life;
         float **type;
-        float **modifLife;
+        //float **modifLife;
         float **modifType;
         float **typeDamage;
 
-        genLifeMat( &life, rows, cols, filePointer ); 
+        genLifeMat( &life, rows, cols, filePointer, initialLife); 
         genTypeMat( &type, rows, cols, filePointer );
         //genBlankMat( &modifLife, rows, cols, filePointer );
         genBlankMat( &modifType, rows, cols, filePointer );
@@ -272,14 +304,19 @@ int play() {
         printf(" \n");
         matShow( type, rows, cols );
         printf(" \n");
-        actNewMats(type, modifType, life, typeDamage, rows, cols);
+        actTypeMat(type, modifType, life, typeDamage, rows, cols, initialLife);
         matShow( life, rows, cols );
+        printf(" \n");
+        matShow( modifType, rows, cols );
+        printf(" \n");
+        
+
 
         //copyAndCleanMat(type, life, rows, cols);
         //matShow( life, rows, cols );
         //printf(" \n");
         //matShow( type, rows, cols );
-        //matShow( typeDamage, typesPokes, typesPokes);
+        matShow( typeDamage, typesPokes, typesPokes);
         //matShow( modifType, rows, cols );
 
 
