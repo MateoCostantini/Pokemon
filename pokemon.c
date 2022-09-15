@@ -128,21 +128,10 @@ void matShow( float ** mat, size_t rows, size_t cols ) {
 //Hacer que se ataquen usando la matriz de damage para calcular el da~no
 
 float genDamage(float ** lifeMat, float ** damageMat, float ** typeMat, int rowIndex, int colIndex){
-    /*int actualPokeType = typeMat[rowIndex][colIndex];
-    int leftPokeType = typeMat[rowIndex-1][colIndex];
-    int rightPokeType = typeMat[rowIndex+1][colIndex];
-    int upPokeType = typeMat[rowIndex][colIndex-1];
-    int downPokeType = typeMat[rowIndex][colIndex+1];
-    
-    return damageMat[leftPokeType][actualPokeType] 
-            + damageMat[rightPokeType][actualPokeType] 
-            + damageMat[upPokeType][actualPokeType] 
-            + damageMat[downPokeType][actualPokeType];*/
 
     float damage;
     float killerType;
     int actualPokeType = typeMat[rowIndex][colIndex];
-    //int actualPokeLife = lifeMat[rowIndex][colIndex];
     int leftPokeType = typeMat[rowIndex-1][colIndex];
     int rightPokeType = typeMat[rowIndex+1][colIndex];
     int upPokeType = typeMat[rowIndex][colIndex-1];
@@ -153,8 +142,7 @@ float genDamage(float ** lifeMat, float ** damageMat, float ** typeMat, int rowI
     while(lifeMat[rowIndex][colIndex] > 0 && i<4){
         damage = damageMat[neighbours[i]][actualPokeType];
         lifeMat[rowIndex][colIndex] -= damage;
-        //actualPokeLife = actualPokeLife - damage;
-        if (lifeMat[rowIndex][colIndex] < 0){
+        if (lifeMat[rowIndex][colIndex] <= 0){
             killerType = neighbours[i];
             i = 0;
             return killerType;
@@ -198,12 +186,7 @@ void actTypeMat(float ** oldTypeMat, float ** newTypeMat, float ** lifeMat, floa
                 }if(lifeMat[r][c] <= 0 && killer != -1.0){
                     newTypeMat[r][c] = killer;
                     lifeMat[r][c] = initialLife;
-                    /*neighboursType[0] = oldTypeMat[r-1][c];
-                    neighboursType[1] = oldTypeMat[r+1][c];
-                    neighboursType[2] = oldTypeMat[r][c-1];
-                    neighboursType[3] = oldTypeMat[r][c+1];
-                    randNeighbour = rand() %3;
-                    while*/
+                    
                 }
             }
         }
@@ -299,26 +282,19 @@ int play() {
 
 
 
-
-        matShow( life, rows, cols );
-        printf(" \n");
+        for (size_t i = 0; i<25; i++){
         matShow( type, rows, cols );
         printf(" \n");
+        /*matShow( type, rows, cols );
+        printf(" \n");*/
         actTypeMat(type, modifType, life, typeDamage, rows, cols, initialLife);
-        matShow( life, rows, cols );
+        /*matShow( life, rows, cols );
         printf(" \n");
         matShow( modifType, rows, cols );
-        printf(" \n");
-        
-
-
-        //copyAndCleanMat(type, life, rows, cols);
-        //matShow( life, rows, cols );
-        //printf(" \n");
-        //matShow( type, rows, cols );
-        matShow( typeDamage, typesPokes, typesPokes);
-        //matShow( modifType, rows, cols );
-
+        printf(" \n");*/
+        copyAndCleanMat(modifType, type, rows, cols);}
+        /*matShow( modifType, rows, cols );
+        matShow( typeDamage, typesPokes, typesPokes);*/
 
 
         //Matlife( &expected, rows, cols, filePointer );
