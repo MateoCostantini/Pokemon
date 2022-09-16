@@ -227,8 +227,8 @@ void checkMat( int **expected, int **provided, size_t rows, size_t cols ) {
     }
 }
 
-void matFree(int ***mat, size_t rows, size_t cols) {
-    int **_m;
+void matFree(float ***mat, size_t rows, size_t cols) {
+    float **_m;
 
     if (mat) {
         _m = *mat;
@@ -241,12 +241,17 @@ void matFree(int ***mat, size_t rows, size_t cols) {
 }
 
 int play(int *parseVals) {
-    FILE *filePointer ;
+    //FILE *filePointer ;
     int rows, cols;
     float initialLife;
-    int const typesPokes = 4;
 
-    filePointer = fopen( "text.txt", "r" ) ;
+    float **life;
+    float **type;
+    float **modifType;
+    float **typeDamage;
+    //int const typesPokes = 4;
+
+    //filePointer = fopen( "text.txt", "r" ) ;
      
     if ( parseVals == NULL ) {
         printf( "fail in arguments given." ) ;
@@ -261,11 +266,7 @@ int play(int *parseVals) {
         cols = parseVals[2]+2;
         initialLife = parseVals[0];
 
-        float **life;
-        float **type;
-        //float **modifLife;
-        float **modifType;
-        float **typeDamage;
+        
 
         genLifeMat( &life, rows, cols, initialLife); 
         genTypeMat( &type, rows, cols);
@@ -306,8 +307,10 @@ int play(int *parseVals) {
         //matShow( provided, rows, cols );
         //checkMat( modifLife, modifType, rows, cols );
 
-        //matFree( &life, rows, cols );
-        //matFree( &expected, rows, cols );
+        matFree( &life, rows, cols );
+        matFree( &type, rows, cols );
+        matFree( &modifType, rows, cols );
+        matFree( &typeDamage, 4, 4);
 
         //fclose(filePointer) ;
         //printf("The file is now closed.\n") ;
