@@ -257,8 +257,8 @@ int play(int *parseVals) {
         genBlankMat( &modifType, rows, cols );
         genTypeDamageMat(&typeDamage);
 
-        matShow( type, rows, cols );
-        printf(" \n");
+        //matShow( type, rows, cols );
+        //printf(" \n");
         //genPPM(type, rows, cols);
 
 
@@ -271,9 +271,9 @@ int play(int *parseVals) {
             }
         }
 
-        matShow( life, rows, cols );
-        puts("");
-        matShow( type, rows, cols );
+        //matShow( life, rows, cols );
+        //puts("");
+        //matShow( type, rows, cols );
         //genPPM(type, rows, cols);
 
         /*matShow( modifType, rows, cols );
