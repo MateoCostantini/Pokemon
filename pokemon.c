@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "createPPM.h"
-#include "argParser.h"
+#include "createPPM.c"
+#include "argParser.c"
  
 
 float **matNew( size_t rows, size_t cols ) {
@@ -99,14 +99,6 @@ void matShow( float ** mat, size_t rows, size_t cols ) {
 
 }
 
-/*void matDamageShow( float ** mat){
-    for ( size_t r = 0; r < 4; r++ ) {
-        for ( size_t c = 0; c < 4; c++ ) {
-            printf( "%f\t", mat[r][c] );
-        }
-        printf( "\n" );
-    }
-}*/
 
 
 float genDamage(float ** lifeMat, float ** damageMat, float ** typeMat, int rowIndex, int colIndex){
@@ -134,24 +126,11 @@ float genDamage(float ** lifeMat, float ** damageMat, float ** typeMat, int rowI
     return -1.0;  
 }
 
-float randNeighbour(float ** typeMat, int rowIndex, int colIndex, int rows, int columns){
-    size_t i;
-    float neighbour;
-    float neighbours[] = {typeMat[rowIndex-1][colIndex], 
-                            typeMat[rowIndex+1][colIndex],
-                            typeMat[rowIndex][colIndex-1],
-                            typeMat[rowIndex][colIndex +1]};
 
-    while (neighbour != (0.0 || 1.0 || 2.0)){
-        i = rand() % 4; 
-        neighbour = neighbours[i];
-    }
-    return neighbour;
-}
 
 void actTypeMat(float ** oldTypeMat, float ** newTypeMat, float ** lifeMat, float ** damageMat, int rows, int columns, float initialLife){
     int neighboursType[4];
-    int randNeighbour;
+    //int randNeighbour;
     float killer;
     for(size_t r=0; r<rows; r++){
         for (size_t c=0; c<columns; c++){
@@ -186,30 +165,6 @@ void copyAndCleanMat(float **new_mat, float **old_mat, size_t rows, size_t colum
 }
 
 
-void duplicateEx( int ** mat, size_t rows, size_t cols ) {
-    for ( size_t r = 0; r < rows; r++ ) {
-        for ( size_t c = 0; c < cols; c++ ) {
-             mat[r][c] = mat[r][c] * 2;
-        }
-    }
-}
-
-void check( int expected, int provided, char* msg ) {
-    if (expected == provided) {
-        printf( "." );
-    } else {
-        puts( "" );
-        puts( msg );
-    }
-}
-
-void checkMat( int **expected, int **provided, size_t rows, size_t cols ) {
-    for ( size_t r = 0; r < rows; r++ ) {
-        for ( size_t c = 0; c < cols; c++ ) {
-            check( expected[r][c], provided[r][c], "expected value fail" );
-        }
-    }
-}
 
 void matFree(float ***mat, size_t rows, size_t cols) {
     float **_m;
@@ -225,7 +180,6 @@ void matFree(float ***mat, size_t rows, size_t cols) {
 }
 
 int play(int *parseVals) {
-    //FILE *filePointer ;
     int rows, cols;
     float initialLife;
     int checkPPMCycle = 0;
@@ -234,33 +188,20 @@ int play(int *parseVals) {
     float **type;
     float **modifType;
     float **typeDamage;
-    //int const typesPokes = 4;
-
-    //filePointer = fopen( "text.txt", "r" ) ;
      
     if ( parseVals == NULL ) {
         printf( "fail in arguments given." ) ;
     } else {
         printf("arguments success.\n") ;
-         
-        //fscanf( filePointer, "%d %d %f", &rows, &cols, &initialLife);
-        //printf( "<%d %d>\n", rows, cols) ;
-        //rows = rows + 2;
-        //cols = cols + 2;
+
         rows = parseVals[1]+2;
         cols = parseVals[2]+2;
         initialLife = parseVals[0];
 
         genLifeMat( &life, rows, cols, initialLife); 
         genTypeMat( &type, rows, cols);
-        //genBlankMat( &modifLife, rows, cols, filePointer );
         genBlankMat( &modifType, rows, cols );
         genTypeDamageMat(&typeDamage);
-
-        //matShow( type, rows, cols );
-        //printf(" \n");
-        //genPPM(type, rows, cols);
-
 
         for (size_t i = 0; i<parseVals[5]; i++){
         checkPPMCycle++;
@@ -271,68 +212,12 @@ int play(int *parseVals) {
             }
         }
 
-        //matShow( life, rows, cols );
-        //puts("");
-        //matShow( type, rows, cols );
-        //genPPM(type, rows, cols);
-
-        /*matShow( modifType, rows, cols );
-        matShow( typeDamage, typesPokes, typesPokes);*/
-
-        //duplicateEx( provided, rows, cols );
-
         matFree( &life, rows, cols );
         matFree( &type, rows, cols );
         matFree( &modifType, rows, cols );
         matFree( &typeDamage, 4, 4);
     }
 }
-
-
-/*void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, bool *parseSuccessPtr){
-    int maxLife, rows, columns, seed, ppmPrint;
-    char *pFlags[] = {"-l", "--life", "-h", "--height", "-w", "--width", "-s", "--seed", "-n", "--nPPMprint", "-r", "--repetitions"};
-    int pFlagsLength = 12;
-    int compare;
-    int argValueIndex;
-    int value;
-    char *leftover;
-    int aux = 0;
-
-    if(argc == pFlagsLength +1){
-        for(size_t i = 1; i < argc-1; i+=2){
-            for(size_t j = 0; j < pFlagsLength; j++){
-                compare = strcmp(argv[i], pFlags[j]);
-                if (compare == 0){
-                    aux++;
-                    argValueIndex = j/2;
-                    value = strtod(argv[i+1], &leftover);
-                    argValues[argValueIndex] = value;
-                }
-            }
-        }
-        if(aux == pFlagsLength/2){
-            *parseSuccessPtr = true;
-        }
-    }if(argc!= pFlagsLength+1 || aux!=pFlagsLength/2){
-        printf("%s", helpMsg);
-            argValues = NULL;
-            return NULL;
-    }*/
-    /*if (argc == 2){
-        if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
-            printf("%s", helpMsg);
-            argValues = NULL;
-            return NULL;
-        }else{
-            argValues = NULL;
-            return NULL;
-        }
-    }else else{
-        argValues = NULL;
-        return NULL;
-    }
-}*/
 
 
  
