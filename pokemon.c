@@ -336,8 +336,8 @@ int main(int argc, char *argv[]) {
     bool *parseSuccessPtr;
     bool  parseSuccess = false;
     parseSuccessPtr = &parseSuccess;
-    int *parseVals;
-    char helpMsg[] = "helpppp\n";
+    int parseVals[6];
+    char helpMsg[300] = "Each of the following flags must be in use to run the program\n-l\tThe life with which the pokemons start the game.\n-r\tamount of rows in the map.\n-c\tAmount of columns in the map.\n-s\tThe seed to change the ramdom. It is used to modify the position of the pokemons.\n-p\tCycle of the PPM\n";
     parser_arguments(argc, argv, helpMsg, parseVals, parseSuccessPtr);
     if (*parseSuccessPtr == true){
         srand(parseVals[3]);
