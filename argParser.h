@@ -18,7 +18,7 @@ void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, boo
                 if (compare == 0){
                     aux++;
                     argValueIndex = j/2;
-                    value = strtod(argv[i+1], &leftover);
+                    value = strtol(argv[i+1], &leftover, 10);
                     argValues[argValueIndex] = value;
                 }
             }

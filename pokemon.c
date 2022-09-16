@@ -228,6 +228,7 @@ int play(int *parseVals) {
     //FILE *filePointer ;
     int rows, cols;
     float initialLife;
+    int checkPPMCycle = 0;
 
     float **life;
     float **type;
@@ -262,8 +263,12 @@ int play(int *parseVals) {
 
 
         for (size_t i = 0; i<parseVals[5]; i++){
+        checkPPMCycle++;
         actTypeMat(type, modifType, life, typeDamage, rows, cols, initialLife);
         copyAndCleanMat(modifType, type, rows, cols);
+        if (checkPPMCycle == parseVals[4]){
+            genPPM(type, rows, cols);
+            }
         }
 
         matShow( life, rows, cols );
