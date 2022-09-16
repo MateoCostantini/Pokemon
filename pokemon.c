@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
  
 
 float **matNew( size_t rows, size_t cols ) {
@@ -248,7 +250,7 @@ void matFree(int ***mat, size_t rows, size_t cols) {
     }
 }
 
-int play() {
+int play(int *parseVals) {
     FILE *filePointer ;
     int rows, cols;
     float initialLife;
@@ -256,15 +258,18 @@ int play() {
 
     filePointer = fopen( "text.txt", "r" ) ;
      
-    if ( filePointer == NULL ) {
-        printf( "file failed to open." ) ;
+    if ( parseVals == NULL ) {
+        printf( "fail in arguments given." ) ;
     } else {
-        printf("The file is now opened.\n") ;
+        printf("arguments success.\n") ;
          
-        fscanf( filePointer, "%d %d %f", &rows, &cols, &initialLife);
-        printf( "<%d %d>\n", rows, cols) ;
-        rows = rows + 2;
-        cols = cols + 2;
+        //fscanf( filePointer, "%d %d %f", &rows, &cols, &initialLife);
+        //printf( "<%d %d>\n", rows, cols) ;
+        //rows = rows + 2;
+        //cols = cols + 2;
+        rows = parseVals[1]+2;
+        cols = parseVals[2]+2;
+        initialLife = parseVals[0];
 
         float **life;
         float **type;
@@ -281,10 +286,10 @@ int play() {
         
 
 
-
-        for (size_t i = 0; i<25; i++){
         matShow( type, rows, cols );
         printf(" \n");
+        for (size_t i = 0; i<125; i++){
+        
         /*matShow( type, rows, cols );
         printf(" \n");*/
         actTypeMat(type, modifType, life, typeDamage, rows, cols, initialLife);
@@ -292,7 +297,12 @@ int play() {
         printf(" \n");
         matShow( modifType, rows, cols );
         printf(" \n");*/
-        copyAndCleanMat(modifType, type, rows, cols);}
+        copyAndCleanMat(modifType, type, rows, cols);
+        }
+        matShow( life, rows, cols );
+        puts("");
+        matShow( type, rows, cols );
+
         /*matShow( modifType, rows, cols );
         matShow( typeDamage, typesPokes, typesPokes);*/
 
@@ -314,8 +324,77 @@ int play() {
     }
 }
 
+int checkParser(int *values, char *argv[]){
+
+}
+
+void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, bool *parseSuccessPtr){
+    int maxLife, rows, columns, seed, ppmPrint;
+    char *pFlags[] = {"-l", "--life", "-r", "--rows", "-c", "--columns", "-s", "--seed", "-p", "--ppmprint"};
+    //int argValues[5]; 
+    int pFlagsLength = 10;
+    int compare;
+    int argValueIndex;
+    int value;
+    char *leftover;
+    int aux = 0;
+
+    //float aux;
+    if (argc == 2){
+        if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
+            printf("%s", helpMsg);
+            argValues = NULL;
+            return NULL;
+        }else{
+            argValues = NULL;
+            return NULL;
+        }
+    }else if(argc == 11){
+        for(size_t i = 1; i < argc-1; i+=2){
+            for(size_t j = 0; j < pFlagsLength; j++){
+                compare = strcmp(argv[i], pFlags[j]);
+                if (compare == 0){
+                    aux++;
+                    argValueIndex = j/2;
+                    value = strtod(argv[i+1], &leftover);
+                    argValues[argValueIndex] = value;
+                }
+            }
+        }
+        if(aux == pFlagsLength/2){
+            *parseSuccessPtr = true;
+        }
+    }else{
+        argValues = NULL;
+        return NULL;
+    }
+    
+            
+            // para comprobar que se hayan usado todos los flags fijarme que tal larga quedo el vector con los valores (tiene que ser 5)
+}
+
+/*typedef enum {
+    ARG_NUMERATOR_SHORT,
+    ARG_NUMERATOR_LONG,
+    ARG_DENOMINATOR_SHORT,
+    ARG_DENOMINATOR_LONG,
+} arg_t;*/
+
  
-int main() {
+int main(int argc, char *argv[]) {
     // save();
-    play();
+    bool *parseSuccessPtr;
+    bool  parseSuccess = false;
+    parseSuccessPtr = &parseSuccess;
+    int *parseVals;
+    char helpMsg[] = "helpppp\n";
+    parser_arguments(argc, argv, helpMsg, parseVals, parseSuccessPtr);
+    if (*parseSuccessPtr == true){
+        srand(parseVals[3]);
+        play(parseVals);
+    }
+    else{
+        return 1;
+    }
+    
 } 
