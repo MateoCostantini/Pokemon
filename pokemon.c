@@ -26,7 +26,6 @@ float **matNew( size_t rows, size_t cols ) {
 
 /*float **matNewDamage( void) {
     float **m = malloc(sizeof(float *) * (4));
-
     if (NULL == m) {
         return NULL;
     }
@@ -40,14 +39,11 @@ float **matNew( size_t rows, size_t cols ) {
             return NULL;
         }
     }
-
     return m;
 }*/
 
-void genLifeMat( float ***mat, size_t rows, size_t columns, FILE *filePointer, float value) {
+void genLifeMat( float ***mat, size_t rows, size_t columns, float value) {
     *mat = matNew( rows, columns );
-    /*float value;
-    fscanf( filePointer, "%f", &value );*/
 
     for ( size_t r = 0; r < rows; r++ ){ 
         for ( size_t c = 0; c < columns; c++ ){ 
@@ -61,7 +57,7 @@ void genLifeMat( float ***mat, size_t rows, size_t columns, FILE *filePointer, f
     }
 }
 
-void genTypeMat(float ***mat, size_t rows, size_t columns, FILE *filepointer){
+void genTypeMat(float ***mat, size_t rows, size_t columns){
     *mat = matNew(rows, columns);
     for (size_t r = 0; r < rows; r++){
         for (size_t c = 0; c< columns; c++){
@@ -74,7 +70,8 @@ void genTypeMat(float ***mat, size_t rows, size_t columns, FILE *filepointer){
     }
 }
 
-void genBlankMat(float ***mat, size_t rows, size_t columns, FILE *filepointer){
+
+void genBlankMat(float ***mat, size_t rows, size_t columns){
     *mat = matNew(rows, columns);
     for (size_t r = 0; r < rows; r++){
         for (size_t c = 0; c< columns; c++){
@@ -117,14 +114,12 @@ void matShow( float ** mat, size_t rows, size_t cols ) {
 }
 
 /*void matDamageShow( float ** mat){
-
     for ( size_t r = 0; r < 4; r++ ) {
         for ( size_t c = 0; c < 4; c++ ) {
             printf( "%f\t", mat[r][c] );
         }
         printf( "\n" );
     }
-
 }*/
 
 //Hacer que se ataquen usando la matriz de damage para calcular el da~no
@@ -168,11 +163,6 @@ float randNeighbour(float ** typeMat, int rowIndex, int colIndex, int rows, int 
         neighbour = neighbours[i];
     }
     return neighbour;
-    // si se mueren un cuadrado de 3x3 al mismo tiempo, saltaria un error con el espacio del medio, porque si el while corre hasta que no sea pared
-    //y hasta que encuentre un vecino vivo para reemplazar, habria que crear un tipo de poke vacio
-
-//podria hacer que se peguen de a uno y crear un while el que recibe dano sigue vivo y falta que alguien le pegue, que le sigan pegando y sino que se cambie
-// al tipo del ultimo que le pego (si se murio)
 }
 
 void actTypeMat(float ** oldTypeMat, float ** newTypeMat, float ** lifeMat, float ** damageMat, int rows, int columns, float initialLife){
@@ -277,10 +267,10 @@ int play(int *parseVals) {
         float **modifType;
         float **typeDamage;
 
-        genLifeMat( &life, rows, cols, filePointer, initialLife); 
-        genTypeMat( &type, rows, cols, filePointer );
+        genLifeMat( &life, rows, cols, initialLife); 
+        genTypeMat( &type, rows, cols);
         //genBlankMat( &modifLife, rows, cols, filePointer );
-        genBlankMat( &modifType, rows, cols, filePointer );
+        genBlankMat( &modifType, rows, cols );
         genTypeDamageMat(&typeDamage);
         
         
@@ -319,19 +309,15 @@ int play(int *parseVals) {
         //matFree( &life, rows, cols );
         //matFree( &expected, rows, cols );
 
-        fclose(filePointer) ;
-        printf("The file is now closed.\n") ;
+        //fclose(filePointer) ;
+        //printf("The file is now closed.\n") ;
     }
 }
 
-int checkParser(int *values, char *argv[]){
-
-}
 
 void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, bool *parseSuccessPtr){
     int maxLife, rows, columns, seed, ppmPrint;
     char *pFlags[] = {"-l", "--life", "-r", "--rows", "-c", "--columns", "-s", "--seed", "-p", "--ppmprint"};
-    //int argValues[5]; 
     int pFlagsLength = 10;
     int compare;
     int argValueIndex;
@@ -339,17 +325,7 @@ void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, boo
     char *leftover;
     int aux = 0;
 
-    //float aux;
-    if (argc == 2){
-        if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
-            printf("%s", helpMsg);
-            argValues = NULL;
-            return NULL;
-        }else{
-            argValues = NULL;
-            return NULL;
-        }
-    }else if(argc == 11){
+    if(argc == 11){
         for(size_t i = 1; i < argc-1; i+=2){
             for(size_t j = 0; j < pFlagsLength; j++){
                 compare = strcmp(argv[i], pFlags[j]);
@@ -365,12 +341,23 @@ void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, boo
             *parseSuccessPtr = true;
         }
     }else{
+        printf("%s", helpMsg);
+            argValues = NULL;
+            return NULL;
+    }
+    /*if (argc == 2){
+        if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
+            printf("%s", helpMsg);
+            argValues = NULL;
+            return NULL;
+        }else{
+            argValues = NULL;
+            return NULL;
+        }
+    }else else{
         argValues = NULL;
         return NULL;
-    }
-    
-            
-            // para comprobar que se hayan usado todos los flags fijarme que tal larga quedo el vector con los valores (tiene que ser 5)
+    }*/
 }
 
 /*typedef enum {
@@ -397,4 +384,4 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
-} 
+}
