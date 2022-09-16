@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include "createPPM.h"
  
 
 float **matNew( size_t rows, size_t cols ) {
@@ -24,23 +25,7 @@ float **matNew( size_t rows, size_t cols ) {
     return m;
 }
 
-/*float **matNewDamage( void) {
-    float **m = malloc(sizeof(float *) * (4));
-    if (NULL == m) {
-        return NULL;
-    }
-    for (size_t i = 0; i < 4; i++) {
-        m[i] = malloc((4) * sizeof(float));
-        if (NULL == m[i]) {
-            while (i--) {
-                free(m[i]);
-            }
-            free(m);
-            return NULL;
-        }
-    }
-    return m;
-}*/
+
 
 void genLifeMat( float ***mat, size_t rows, size_t columns, float value) {
     *mat = matNew( rows, columns );
@@ -122,10 +107,8 @@ void matShow( float ** mat, size_t rows, size_t cols ) {
     }
 }*/
 
-//Hacer que se ataquen usando la matriz de damage para calcular el da~no
 
 float genDamage(float ** lifeMat, float ** damageMat, float ** typeMat, int rowIndex, int colIndex){
-
     float damage;
     float killerType;
     int actualPokeType = typeMat[rowIndex][colIndex];
@@ -170,8 +153,8 @@ void actTypeMat(float ** oldTypeMat, float ** newTypeMat, float ** lifeMat, floa
     int randNeighbour;
     float killer;
     for(size_t r=0; r<rows; r++){
-        for (size_t c=0; c<rows; c++){
-            if (oldTypeMat[r][c] != 3){
+        for (size_t c=0; c<columns; c++){
+            if (oldTypeMat[r][c] != 3.0){
                 if(lifeMat[r][c] > 0){
                     killer = genDamage(lifeMat, damageMat, oldTypeMat, r, c);
                     newTypeMat[r][c] = oldTypeMat[r][c];
@@ -266,61 +249,43 @@ int play(int *parseVals) {
         cols = parseVals[2]+2;
         initialLife = parseVals[0];
 
-        
-
         genLifeMat( &life, rows, cols, initialLife); 
         genTypeMat( &type, rows, cols);
         //genBlankMat( &modifLife, rows, cols, filePointer );
         genBlankMat( &modifType, rows, cols );
         genTypeDamageMat(&typeDamage);
-        
-        
-
 
         matShow( type, rows, cols );
         printf(" \n");
-        for (size_t i = 0; i<125; i++){
-        
-        /*matShow( type, rows, cols );
-        printf(" \n");*/
+        //genPPM(type, rows, cols);
+
+
+        for (size_t i = 0; i<10; i++){
         actTypeMat(type, modifType, life, typeDamage, rows, cols, initialLife);
-        /*matShow( life, rows, cols );
-        printf(" \n");
-        matShow( modifType, rows, cols );
-        printf(" \n");*/
         copyAndCleanMat(modifType, type, rows, cols);
         }
+
         matShow( life, rows, cols );
         puts("");
         matShow( type, rows, cols );
+        genPPM(type, rows, cols);
 
         /*matShow( modifType, rows, cols );
         matShow( typeDamage, typesPokes, typesPokes);*/
 
-
-        //Matlife( &expected, rows, cols, filePointer );
-        //matShow( expected, rows, cols );
-
-
         //duplicateEx( provided, rows, cols );
-
-        //matShow( provided, rows, cols );
-        //checkMat( modifLife, modifType, rows, cols );
 
         matFree( &life, rows, cols );
         matFree( &type, rows, cols );
         matFree( &modifType, rows, cols );
         matFree( &typeDamage, 4, 4);
-
-        //fclose(filePointer) ;
-        //printf("The file is now closed.\n") ;
     }
 }
 
 
 void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, bool *parseSuccessPtr){
     int maxLife, rows, columns, seed, ppmPrint;
-    char *pFlags[] = {"-l", "--life", "-r", "--rows", "-c", "--columns", "-s", "--seed", "-p", "--ppmprint"};
+    char *pFlags[] = {"-l", "--life", "-h", "--height", "-w", "--width", "-s", "--seed", "-n", "--nPPMprint"};
     int pFlagsLength = 10;
     int compare;
     int argValueIndex;
@@ -343,7 +308,7 @@ void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, boo
         if(aux == pFlagsLength/2){
             *parseSuccessPtr = true;
         }
-    }else{
+    }if(argc!= 11 || aux!=5){
         printf("%s", helpMsg);
             argValues = NULL;
             return NULL;
@@ -363,12 +328,6 @@ void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, boo
     }*/
 }
 
-/*typedef enum {
-    ARG_NUMERATOR_SHORT,
-    ARG_NUMERATOR_LONG,
-    ARG_DENOMINATOR_SHORT,
-    ARG_DENOMINATOR_LONG,
-} arg_t;*/
 
  
 int main(int argc, char *argv[]) {
