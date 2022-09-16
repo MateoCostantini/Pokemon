@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "createPPM.h"
+#include "argParser.h"
  
 
 float **matNew( size_t rows, size_t cols ) {
@@ -283,7 +284,7 @@ int play(int *parseVals) {
 }
 
 
-void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, bool *parseSuccessPtr){
+/*void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, bool *parseSuccessPtr){
     int maxLife, rows, columns, seed, ppmPrint;
     char *pFlags[] = {"-l", "--life", "-h", "--height", "-w", "--width", "-s", "--seed", "-n", "--nPPMprint", "-r", "--repetitions"};
     int pFlagsLength = 12;
@@ -312,7 +313,7 @@ void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, boo
         printf("%s", helpMsg);
             argValues = NULL;
             return NULL;
-    }
+    }*/
     /*if (argc == 2){
         if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
             printf("%s", helpMsg);
@@ -325,8 +326,8 @@ void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, boo
     }else else{
         argValues = NULL;
         return NULL;
-    }*/
-}
+    }
+}*/
 
 
  
