@@ -260,7 +260,7 @@ int play(int *parseVals) {
         //genPPM(type, rows, cols);
 
 
-        for (size_t i = 0; i<10; i++){
+        for (size_t i = 0; i<parseVals[5]; i++){
         actTypeMat(type, modifType, life, typeDamage, rows, cols, initialLife);
         copyAndCleanMat(modifType, type, rows, cols);
         }
@@ -268,7 +268,7 @@ int play(int *parseVals) {
         matShow( life, rows, cols );
         puts("");
         matShow( type, rows, cols );
-        genPPM(type, rows, cols);
+        //genPPM(type, rows, cols);
 
         /*matShow( modifType, rows, cols );
         matShow( typeDamage, typesPokes, typesPokes);*/
@@ -285,15 +285,15 @@ int play(int *parseVals) {
 
 void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, bool *parseSuccessPtr){
     int maxLife, rows, columns, seed, ppmPrint;
-    char *pFlags[] = {"-l", "--life", "-h", "--height", "-w", "--width", "-s", "--seed", "-n", "--nPPMprint"};
-    int pFlagsLength = 10;
+    char *pFlags[] = {"-l", "--life", "-h", "--height", "-w", "--width", "-s", "--seed", "-n", "--nPPMprint", "-r", "--repetitions"};
+    int pFlagsLength = 12;
     int compare;
     int argValueIndex;
     int value;
     char *leftover;
     int aux = 0;
 
-    if(argc == 11){
+    if(argc == pFlagsLength +1){
         for(size_t i = 1; i < argc-1; i+=2){
             for(size_t j = 0; j < pFlagsLength; j++){
                 compare = strcmp(argv[i], pFlags[j]);
@@ -308,7 +308,7 @@ void *parser_arguments(int argc, char*argv[], char *helpMsg, int *argValues, boo
         if(aux == pFlagsLength/2){
             *parseSuccessPtr = true;
         }
-    }if(argc!= 11 || aux!=5){
+    }if(argc!= pFlagsLength+1 || aux!=pFlagsLength/2){
         printf("%s", helpMsg);
             argValues = NULL;
             return NULL;
